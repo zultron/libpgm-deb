@@ -1,0 +1,49 @@
+From: Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>
+Subject: [PATCH] time.c: force running benchmark in case tsc_mhz returns 0 from /proc/cpuinfo
+Origin: vendor
+Forwarded: yes
+Bug-Upstream: https://code.google.com/p/openpgm/issues/detail?id=35
+
+--- a/openpgm/pgm/time.c
++++ b/openpgm/pgm/time.c
+@@ -698,11 +698,16 @@
+  */
+ 	FILE	*fp = fopen ("/proc/cpuinfo", "r");
+ 	char	buffer[1024], *flags = NULL;
++	static uint_fast32_t	tmp_tsc_mhz = 0;
++	static bool	ret = FALSE;
+ 	if (fp)
+ 	{
+ 		while (!feof(fp) && fgets (buffer, sizeof(buffer), fp))
+ 		{
+-			if (strstr (buffer, "flags")) {
++			if (strstr (buffer, "cpu MHz")) {
++				const char *p = strchr (buffer, ':');
++				if (p) tmp_tsc_mhz = atoi (p + 1) * 1000;
++			} else if (strstr (buffer, "flags")) {
+ 				flags = strchr (buffer, ':');
+ 				break;
+ 			}
+@@ -713,14 +718,18 @@
+ 		pgm_warn (_("Linux kernel reports no Time Stamp Counter (TSC)."));
+ /* force both to stable clocks even though one might be OK */
+ 		pgm_time_update_now	= pgm_gettimeofday_update;
+-		return TRUE;
+-	}
+-	if (!strstr (flags, " constant_tsc")) {
++		ret = TRUE;
++	} else if (!strstr (flags, " constant_tsc")) {
+ 		pgm_warn (_("Linux kernel reports non-constant Time Stamp Counter (TSC)."));
+ /* force both to stable clocks even though one might be OK */
+ 		pgm_time_update_now	= pgm_gettimeofday_update;
+-		return TRUE;
++		ret = TRUE;
+ 	}
++
++/* Only return in case the kernel doesn't report 0 as cpu MHz */
++	if ((tmp_tsc_mhz != 0) && ret)
++		return TRUE;
++
+ #		endif /* CONFIG_HAVE_PROC */
+ 
+ 	pgm_time_t		start, stop, elapsed;

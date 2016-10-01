@@ -1,3 +1,22 @@
+libpgm (5.1.118-1~dfsg-~3) unstable; urgency=medium
+
+  * Pick changes from Stretch package:
+
+  [ Laszlo Boszormenyi (GCS) <gcs@debian.org> ]
+  * Update upstream source location and watch file.
+  * Multi-Arch the package (closes: #674610).
+  * Update packaging and enable parallel build.
+  * Correct libpgm-5.1.so broken symlink (closes: #775367).
+
+  [ Jérémy Bobbio <lunar@debian.org> ]
+  * Allow one to override the recorded build time (closes: #814832).
+
+  [ Ricardo Salveti de Araujo <ricardo.salveti@canonical.com> ]
+  * force-running-benchmark-in-case-tsc_mhz-returns-0.patch:
+    - Force running benchmark in case /proc/cpuinfo returns 0 as cpu MHz
+
+ -- John Morris <john@zultron.com>  Fri, 30 Sep 2016 21:08:23 -0500
+
 libpgm (5.1.118-1~dfsg-1) unstable; urgency=medium
 
   * Apply Hurd FTBFS fix (closes: #747237).

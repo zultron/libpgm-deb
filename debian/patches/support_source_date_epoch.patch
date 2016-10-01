@@ -1,0 +1,20 @@
+Description: add support for SOURCE_DATE_EPOCH
+ Allow to override the recorded build time by setting SOURCE_DATE_EPOCH
+ in the environment. More details can be found on:
+ https://reproducible-builds.org/specs/source-date-epoch/
+Author: Jérémy Bobbio <lunar@debian.org>
+
+--- a/openpgm/pgm/version_generator.py
++++ b/openpgm/pgm/version_generator.py
+@@ -4,8 +4,9 @@
+ import platform
+ import time
+ 
+-build_date = time.strftime ("%Y-%m-%d")
+-build_time = time.strftime ("%H:%M:%S")
++timestamp = time.gmtime (int (os.getenv ('SOURCE_DATE_EPOCH', time.time ())))
++build_date = time.strftime ("%Y-%m-%d", timestamp)
++build_time = time.strftime ("%H:%M:%S", timestamp)
+ build_rev = filter (str.isdigit, "$Revision: 1369 $")
+ 
+ print """

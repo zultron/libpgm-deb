@@ -1,12 +1,7 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
-%:
-	dh $@ --sourcedirectory=openpgm/pgm --with autoreconf
-
-override_dh_auto_configure:
-	cd openpgm/pgm && \
-		./configure --prefix=/usr
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
 
 override_dh_clean:
 	dh_clean
@@ -20,13 +15,13 @@ override_dh_install:
 	find debian/libpgm-dev/usr/lib  -name "*.la" -exec \
 		sed -i -e "s,^dependency_libs=.*,dependency_libs=''," {} +
 	dh_link -plibpgm-dev \
-		libpgm-5.1.so.0 usr/lib/libpgm-5.1.so
+		/usr/lib/$(DEB_HOST_MULTIARCH)/libpgm-5.1.so.0 \
+		/usr/lib/$(DEB_HOST_MULTIARCH)/libpgm-5.1.so
 
 override_dh_strip:
 	dh_strip --dbg-package=libpgm-dbg
 
-override_dh_auto_build:
-	cd openpgm/pgm && $(MAKE)
+%:
+	dh $@ --sourcedirectory=openpgm/pgm --with autoreconf --parallel
 
-.PHONY: override_dh_auto_configure override_dh_install \
-	override_dh_strip override_dh_auto_build
+.PHONY: override_dh_install override_dh_strip

@@ -1,10 +1,11 @@
 Format: http://dep.debian.net/deps/dep5/
 Upstream-Name: OpenPGM
 Upstream-Contact: Steven McCoy <steven.mccoy@miru.hk>
-Source: http://code.google.com/p/openpgm/
+Source: https://github.com/steve-o/openpgm
 
 Files: debian/*
-Copyright: 2006-2011 Miru Limited & Gabriel de Perthuis
+Copyright: Copyright (C) 2014-     Laszlo Boszormenyi (GCS) <gcs@debian.org>,
+ Copyright (C) 2006-2011 Miru Limited & Gabriel de Perthuis
 License: LGPL-2.1
 
 Files: *

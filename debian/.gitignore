@@ -1,0 +1,6 @@
+/autoreconf.*
+/files
+/libpgm-*.debhelper*
+/libpgm-*.substvars
+/libpgm-*/
+/tmp/
