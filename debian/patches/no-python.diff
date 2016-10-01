@@ -1,0 +1,111 @@
+Modify the existing `version.pl` script to do what
+`version_generator.py` does so that this package doesn't need
+`Build-Requires: python`.
+
+--- b/openpgm/pgm/Makefile.am
++++ a/openpgm/pgm/Makefile.am
+@@ -80,7 +80,8 @@
+ 
+ # nb: Solaris make does not understand $<
+ version.c: version_generator.py
+-	$(AM_V_GEN)$(PYTHON) $(srcdir)/version_generator.py > $@
++#	# $(AM_V_GEN)$(PYTHON) $(srcdir)/version_generator.py > $@
++	$(AM_V_GEN)$(PERL) $(srcdir)/version.pl '%body' $(host_cpu) > $@
+ 
+ galois_tables.c: galois_generator.pl
+ 	$(AM_V_GEN)$(PERL) $(srcdir)/galois_generator.pl > $@
+
+--- b/openpgm/pgm/version.pl
++++ a/openpgm/pgm/version.pl
+@@ -5,14 +5,44 @@
+ # For Autoconf/libtool & CMake
+ 
+ open (MOO, 'version_generator.py') || die "version.py: error: version_generator.py not found.\n";
++my $in_body = 0;
++$version{'body'} = "";
++($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = gmtime();
++use POSIX qw(strftime);
++$datestring = strftime("%x", gmtime());
++$timestring = strftime("%X", gmtime());
++$build_machine = ${ARGV[1]} if ($ARGV[1]);
+ while (<MOO>) {
+ 	if (/pgm_(major|minor|micro)_version = (\d+);/) {
+ 		$version{$1} = $2;
+ 	}
++
++	# Extract revision
++	if (/\$Revision: (\d+) \$/) {
++	    $version{'revision'} = $1;
++	}
++
++	# Fill in pgm_build_* strings
++	s/%s/$datestring/ if /pgm_build_date/;
++	s/%s/$timestring/ if /pgm_build_time/;
++	s/%s/Linux/ if /pgm_build_system/;
++	s/%s/$build_machine/ if /pgm_build_machine/;
++	s/%s/$version{'revision'}/ if /pgm_build_revision/;
++
++	# Extract .h file
++	if (! $in_body && /\"\"\"/) {
++	    $in_body = 1;
++	} elsif ($in_body && /\"\"\"/) {
++	    $in_body = 0;
++	} elsif ($in_body) {
++	    $version{'body'} .= $_;
++	}
+ }
+ $_ = "%major.%minor.%micro";
+ $_ = "${ARGV[0]}" if ($ARGV[0]);
+ s/%major/${version{'major'}}/g;
+ s/%minor/${version{'minor'}}/g;
+ s/%micro/${version{'micro'}}/g;
++s/%revision/${version{'revision'}}/g;
++s/%body/${version{'body'}}/g;
+ print;
+--- libpgm-deb.orig/openpgm/pgm/configure.ac
++++ libpgm-deb/openpgm/pgm/configure.ac
+@@ -146,16 +146,14 @@ AC_COMPILE_IFELSE(
+                 CFLAGS="$CFLAGS -DCONFIG_HAVE_EVENTFD"],
+         [AC_MSG_RESULT([no])])
+ # useful /proc system
+-AC_CHECK_FILE([/proc/cpuinfo],
+-		CFLAGS="$CFLAGS -DCONFIG_HAVE_PROC",)
++CFLAGS="$CFLAGS -DCONFIG_HAVE_PROC"
+ # example: crash handling
+ AC_CHECK_FUNC([backtrace],
+ 		CFLAGS="$CFLAGS -DCONFIG_HAVE_BACKTRACE",)
+ # timing
+ AC_CHECK_FUNC([pselect],
+ 		CFLAGS="$CFLAGS -DCONFIG_HAVE_PSELECT",)
+-AC_CHECK_FILE([/dev/rtc],
+-		CFLAGS="$CFLAGS -DCONFIG_HAVE_RTC",)
++CFLAGS="$CFLAGS -DCONFIG_HAVE_RTC"
+ AC_MSG_CHECKING([for RDTSC instruction])
+ case "$host_os" in
+ darwin*)
+@@ -170,8 +168,7 @@ __asm__ __volatile__ ("rdtsc" : "=a" (lo
+ 	[AC_MSG_RESULT([no])])
+ 	;;
+ esac
+-AC_CHECK_FILE([/dev/hpet],
+-		CFLAGS="$CFLAGS -DCONFIG_HAVE_HPET",)
++CFLAGS="$CFLAGS -DCONFIG_HAVE_HPET"
+ # event handling
+ AC_CHECK_FUNC([poll],
+ 		CFLAGS="$CFLAGS -DCONFIG_HAVE_POLL",)
+@@ -276,14 +273,7 @@ uint32_t add32_with_carry (uint32_t a, u
+ 	;;
+ esac
+ # ticket spinlock friendly: unaligned pointers & atomic ops (excl. Sun Pro)
+-AC_MSG_CHECKING([for unaligned pointers])
+-AC_RUN_IFELSE(
+-	[AC_LANG_PROGRAM([[char* nezumi = "mouse";]],
+-		[[short x = *(short*)(nezumi + 2)]])],
+-	[AC_MSG_RESULT([yes])
+-		pgm_unaligned_pointers=yes],
+-	[AC_MSG_RESULT([no])
+-		pgm_unaligned_pointers=no])
++pgm_unaligned_pointers=yes
+ AC_MSG_CHECKING([for intrinsic atomic ops])
+ # AC_PREPROC_IFELSE not always portable
+ AC_COMPILE_IFELSE(
