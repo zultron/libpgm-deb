@@ -2,3 +2,4 @@ hurd-ftbfs-fix.patch
 force-running-benchmark-in-case-tsc_mhz-returns-0.patch
 support_source_date_epoch.patch
 no-python.diff
+rpl_malloc.diff
