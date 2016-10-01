@@ -1,0 +1,60 @@
+libpgm (5.1.118-1~dfsg-1) unstable; urgency=medium
+
+  * Apply Hurd FTBFS fix (closes: #747237).
+  * Empty dependency_libs.
+  * Update Standards-Version to 3.9.6 and debhelper level to 9 .
+  * Update watch file.
+  * New maintainer (closes: #761246).
+
+ -- Laszlo Boszormenyi (GCS) <gcs@debian.org>  Mon, 20 Oct 2014 19:41:43 +0000
+
+libpgm (5.1.118-1~dfsg-0.2) unstable; urgency=medium
+
+  * Non-maintainer upload. 
+  * Use dh-autoreconf to regenerate autoconf and libtool scripts
+    (Closes: #752010, #759462).
+
+ -- Aurelien Jarno <aurel32@debian.org>  Thu, 11 Sep 2014 23:20:14 +0200
+
+libpgm (5.1.118-1~dfsg-0.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Imported Upstream version 5.1.118-1~dfsg (Closes: #645758)
+  * Drop patches included in upstream.
+  * Do not bootstrap while build as upstream ships configure.
+
+ -- Kefu Chai <tchaikov@gmail.com>  Sun, 29 Apr 2012 13:07:51 +0800
+
+libpgm (5.1.116~dfsg-2) unstable; urgency=low
+
+  * Rebuild with an updated symbols file for non-linux kernels.
+  * Conflict libpgm-dev with libnetpbm9-dev. This package has
+    been deprecated since 2003 and a replacement, libnetpbm10-dev,
+    exists (Closes: #624511).
+
+ -- Gabriel de Perthuis <g2p.code+debian@gmail.com>  Fri, 29 Apr 2011 19:23:03 +0200
+
+libpgm (5.1.116~dfsg-1) unstable; urgency=low
+
+  * Imported Upstream version 5.1.116~dfsg
+  * Initial release to Debian (Closes: #566126)
+
+ -- Gabriel de Perthuis <g2p.code+debian@gmail.com>  Thu, 07 Apr 2011 16:48:52 +0200
+
+libpgm (5.1.115~dfsg-1) unstable; urgency=low
+
+  * Imported Upstream version 5.1.115~dfsg
+
+ -- Gabriel de Perthuis <g2p.code+debian@gmail.com>  Thu, 07 Apr 2011 11:45:51 +0200
+
+libpgm (5.1.114~dfsg-1) unstable; urgency=low
+
+  * Imported Upstream version 5.1.114~dfsg
+
+ -- Gabriel de Perthuis <g2p.code@gmail.com>  Mon, 28 Mar 2011 12:35:51 +0200
+
+libpgm (5.1.102-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Steven McCoy <steven.mccoy@miru.hk>  Wed, 19 Jan 2011 14:17:08 +0800

@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+%:
+	dh $@ --sourcedirectory=openpgm/pgm --with autoreconf
+
+override_dh_auto_configure:
+	cd openpgm/pgm && \
+		./configure --prefix=/usr
+
+override_dh_clean:
+	dh_clean
+	# ignore generated files
+	rm -f openpgm/pgm/version.c \
+              openpgm/pgm/galois_tables.c
+	rm -rf openpgm/pgm/autom4te.cache
+
+override_dh_install:
+	dh_install --fail-missing
+	find debian/libpgm-dev/usr/lib  -name "*.la" -exec \
+		sed -i -e "s,^dependency_libs=.*,dependency_libs=''," {} +
+	dh_link -plibpgm-dev \
+		libpgm-5.1.so.0 usr/lib/libpgm-5.1.so
+
+override_dh_strip:
+	dh_strip --dbg-package=libpgm-dbg
+
+override_dh_auto_build:
+	cd openpgm/pgm && $(MAKE)
+
+.PHONY: override_dh_auto_configure override_dh_install \
+	override_dh_strip override_dh_auto_build
